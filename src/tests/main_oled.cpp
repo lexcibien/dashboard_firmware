@@ -2,15 +2,20 @@
 #include <U8g2lib.h>
 #include "bitmap_icons.h"
 
-/* Constructor */
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-/* u8g2.begin() is required and will sent the setup/init sequence to the display */
 void setup(void) {
   u8g2.begin();
+  Serial.begin(115200);
+  delay(5000);
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  Serial.println("Iniciando Exemplo");
 }
 
 void loop(void) {
+  Serial.println("Texto Hello World");
+  digitalWrite(LED_BUILTIN, HIGH);
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_ncenB14_tr);
   u8g2.drawStr(0, 30, "Hello World!");
@@ -21,6 +26,8 @@ void loop(void) {
 
   delay(1000);
 
+  Serial.println("Texto Teste limpar");
+  digitalWrite(LED_BUILTIN, LOW);
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_ncenB14_tr);
   u8g2.drawStr(0, 30, "Teste limpar!");
