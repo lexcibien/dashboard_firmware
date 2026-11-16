@@ -1,0 +1,9 @@
+---
+Checks: >-
+  *,
+  -altera-*,
+  -llvmlibc-*,
+
+HeaderFilterRegex: '(^|.*/)(main)/.*'
+ExcludeHeaderFilterRegex: '(^|.*/)\build/.*'
+...

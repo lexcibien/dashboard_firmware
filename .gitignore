@@ -65,6 +65,11 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
+# ESP-IDF generated project configuration
+sdkconfig
+sdkconfig.old
+managed_components/
+
 # Temporary files
 *.tmp
 *.log

@@ -1,0 +1,18 @@
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: None
+  Includes:
+    AnalyzeAngledIncludes: false
+
+CompileFlags:
+  Remove:
+    - -mtune=esp-base
+
+Index:
+  StandardLibrary: false
+
+---
+If:
+  PathMatch: '\build/.*'
+Index:
+  Background: Skip
