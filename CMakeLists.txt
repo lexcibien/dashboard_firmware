@@ -3,7 +3,6 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/src")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(dashboard_firmware DESCRIPTION Firmware para o dashboard com ESP32-C3 que contém um display TFT)

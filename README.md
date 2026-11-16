@@ -1,10 +1,9 @@
 # Dashboard firmware
 
-## Migração ESP-IDF + TFT_eSPI
+## ESP-IDF + TFT_eSPI
 
-O projeto ESP-IDF está sendo introduzido ao lado do legado PlatformIO. Os
-arquivos em `src/` continuam preservados como referência até que o demo ESP-IDF
-seja validado no hardware.
+O build ativo usa ESP-IDF e CMake para o ESP32-C3. O aplicativo fica em
+`main/`, que é o nome convencional do componente principal no ESP-IDF.
 
 ### Stack fixada
 
@@ -41,9 +40,9 @@ idf.py size
 
 No `menuconfig`, configure o driver GC9A01, 240x240, SPI, os pinos provisórios
 do smoke test e desative o autostart de `setup()`/`loop()` do Arduino. O
-`app_main()` chama `initArduino()` diretamente. Nesta organização, o aplicativo
-fica em `src/`; o `CMakeLists.txt` raiz registra esse diretório como componente
-ESP-IDF por meio de `EXTRA_COMPONENT_DIRS`.
+`app_main()` chama `initArduino()` diretamente. O Arduino-ESP32 e o TFT_eSPI
+são uma ponte temporária de migração; a arquitetura final deverá usar as APIs
+nativas do ESP-IDF quando o teste de hardware estiver validado.
 
 Pinagem provisória do primeiro teste TFT:
 
@@ -84,14 +83,32 @@ MENU=0..5
 
 Os comandos de texto não são o protocolo de produção.
 
-## Display - Apenas RP2350
+## Referências legadas do RP2350/PlatformIO
+
+Os arquivos em `boards/`, incluindo `boards/pinouts/User_Setup.h`, são
+referências da configuração antiga do PlatformIO. Eles não são consumidos pelo
+build atual do ESP-IDF, não definem a pinagem de produção do ESP32-C3 e devem
+ser tratados como legado até serem substituídos por uma configuração de placa
+específica do ESP-IDF. A descrição desses arquivos está em
+[`boards/README.md`](boards/README.md).
+
+O OLED SSD1306 e o shifter físico pertencem ao firmware separado do RP2040.
+Este repositório é responsável pelo dashboard no ESP32-C3; não mova essas
+responsabilidades para cá.
+
+### Display legado do RP2350
 
 Segui esses vídeos:
 
 - [Biblioteca](https://www.manualdomaker.com/article/display-lcd-gc-9-a01-redondo/)
 - [Conexão de pinos](https://www.youtube.com/watch?v=2wPPcgb-Vvg)
 
-Dentro do arquivo `.pio/libdeps/<env>/TFT_eSPI/User_Setup_Select.h`, adicionar essas linhas acima de `#ifndef USER_SETUP_LOADED`:
+Esta configuração documenta somente o experimento antigo do RP2350. O arquivo
+`.pio/libdeps/<env>/TFT_eSPI/User_Setup_Select.h` não faz parte do build atual e
+não deve ser editado para configurar o projeto ESP-IDF.
+
+Na configuração antiga, eram adicionadas estas linhas acima de
+`#ifndef USER_SETUP_LOADED`:
 
 ```cpp
 #ifdef TFT_ESPI_USER_SETUP_PATH  // Use external User_Setup.h if defined

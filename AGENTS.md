@@ -15,15 +15,25 @@ The **RP2040 owns the physical shifter, USB HID, and SSD1306 I²C OLED**. Do not
 
 These instructions apply to all files in this repository. Prefer small, testable changes; retain functioning behavior during migrations.
 
-## Current repository state (legacy)
+## Current repository state
 
-Before changing the project, inspect the existing files. As of the initial migration plan:
-- `platformio.ini`: Arduino/PlatformIO environments. `test_tft` extends `rpipico2`, **not** the ESP32-C3 environment.
-- `src/tests/main_tft.cpp`: GC9A01 demo using `TFT_eSPI`, full-screen `TFT_eSprite`, `gauge1`…`gauge6`, `Orbitron_Medium_28`, a triangular needle, and serial `VALUE=` / `MENU=` commands.
-- `src/main.cpp`: U8g2/SSD1306 Arduino demo; **not the target display implementation** for ESP32-C3.
-- `README.md`: primarily documents the old RP2350 GC9A01 wiring.
+Before changing the project, inspect the existing files. The active repository state is:
+- `platformio.ini` was removed. PlatformIO files under `boards/` are historical
+  references and are not part of the active ESP-IDF build.
+- `main/main.cpp` is currently the ESP-IDF application component. It uses
+  Arduino-ESP32 as a temporary bridge for the TFT_eSPI GC9A01 demo, with a
+  full-screen `TFT_eSprite`, six gauge images, `Orbitron_Medium_28`, a
+  triangular needle, and development-only `VALUE=` / `MENU=` commands.
+- The SSD1306 demo and the physical shifter belong to the separate RP2040
+  firmware; they are not responsibilities of this ESP32-C3 application.
+- `README.md` documents the active ESP-IDF build and keeps the old RP2350
+  wiring under a clearly marked legacy section.
 
-Treat these files as **migration references**, not as the final architecture. Preserve gauge artwork, scaling, fonts, visual layout, and working behavior where practical. Never claim the ESP-IDF migration is complete while the project still builds only through PlatformIO.
+Treat the TFT_eSPI/Arduino integration as a migration stage, not the final
+architecture. Preserve gauge artwork, scaling, fonts, visual layout, and
+working behavior where practical. Do not describe native `esp_lcd`, UART,
+NVS, Wi-Fi or web-server modules as implemented until they exist and have been
+validated.
 
 ## Target toolchain and dependencies
 
@@ -166,12 +176,12 @@ Host tests should cover protocol framing/CRC, parsing, range conversion, and ang
 - Legacy `loop()` redraws the whole frame without pacing: introduce a defined update cadence.
 - Legacy gauges and `Orbitron_Medium_28` rely on TFT_eSPI-specific image/font conventions: verify conversions visually.
 - `TFT_eSprite` full-frame allocation may compete with Wi-Fi and HTTP memory; measure before choosing a rendering backend.
-- The `src/main.cpp` SSD1306 demo belongs to the legacy experiments. The **production OLED lives on the RP2040**, not here.
+- Any SSD1306 demo belongs to the legacy experiments. The **production OLED lives on the RP2040**, not here.
 
 ## Rules for coding agents
 
 Before editing:
-1. Read this file, `README.md`, `platformio.ini`, and the files affected by the requested change.
+1. Read this file, `README.md`, any present legacy build files, and the files affected by the requested change.
 2. Distinguish **existing implementation** from **planned architecture**. Never describe unimplemented features as present.
 3. State any hardware assumptions (GPIOs, display variant, wiring) clearly; ask only when those details are essential and cannot be inferred.
 
