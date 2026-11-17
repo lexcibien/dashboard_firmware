@@ -14,7 +14,7 @@
 - [ ] Testar o microcontrolador com módulo de rede CAN no painel
 - [ ] Adicionar display redondo TFT
   - [ ] Mostrar mapa ou direções
-  - [ ] Usar biblioteca TFT_eSPI ou squareline studio LVGL
+  - [x] Usar widgets LVGL; avaliar LVGL Pro/SquareLine para telas maiores
   - [ ] Arrumar a agulha do exemplo com esse [código](https://github.com/VolosR/BoatGauges)
 
   TIME ID LEN DATA -

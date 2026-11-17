@@ -20,28 +20,31 @@ These instructions apply to all files in this repository. Prefer small, testable
 Before changing the project, inspect the existing files. The active repository state is:
 - `platformio.ini` was removed. PlatformIO files under `boards/` are historical
   references and are not part of the active ESP-IDF build.
-- `main/main.cpp` is currently the ESP-IDF application component. It uses
-  Arduino-ESP32 as a temporary bridge for the TFT_eSPI GC9A01 demo, with a
-  full-screen `TFT_eSprite`, six gauge images, `Orbitron_Medium_28`, a
-  triangular needle, and development-only `VALUE=` / `MENU=` commands.
+- `main/app_main.cpp` is the thin ESP-IDF entry point. The active example uses
+  native `esp_lcd_gc9a01`, `esp_lvgl_port` and LVGL 9; the dashboard component
+  renders six selectable gauge views with LVGL widgets and a simulated value.
+- The old gauge arrays, fonts and text commands remain as historical assets
+  only. They are not linked by the active build.
 - The SSD1306 demo and the physical shifter belong to the separate RP2040
   firmware; they are not responsibilities of this ESP32-C3 application.
 - `README.md` documents the active ESP-IDF build and keeps the old RP2350
   wiring under a clearly marked legacy section.
 
-Treat the TFT_eSPI/Arduino integration as a migration stage, not the final
-architecture. Preserve gauge artwork, scaling, fonts, visual layout, and
-working behavior where practical. Do not describe native `esp_lcd`, UART,
-NVS, Wi-Fi or web-server modules as implemented until they exist and have been
-validated.
+Treat the old Arduino/display-library integration as historical material, not
+part of the production architecture. Preserve gauge artwork, scaling, fonts,
+visual layout, and working behavior where practical, using LVGL-native widgets
+or the LVGL asset pipeline. Native `esp_lcd` and LVGL display integration now
+exist in the example; UART, NVS, Wi-Fi and web-server modules remain planned
+until they exist and have been validated.
 
 ## Target toolchain and dependencies
 
 - Primary target: **ESP32-C3**, with **ESP-IDF** and CMake (`idf.py`).
 - Prefer the native ESP-IDF stack (`esp_lcd`, SPI master, UART driver, NVS, `esp_http_server`, FreeRTOS).
 - For GC9A01 use an ESP-IDF-compatible panel driver, such as the Espressif `esp_lcd_gc9a01` component, with a version pinned in `idf_component.yml` and tested against the chosen ESP-IDF version.
-- Add **LVGL only if justified** by actual screen/navigation complexity and measured memory consumption. `esp_lcd` itself is a panel/transfer API, **not** a replacement for `TFT_eSPI`'s drawing primitives.
-- `TFT_eSPI` may remain for legacy demos or as a temporary migration option. Do not introduce Arduino-as-component into the new production design without documenting the reason and tradeoffs.
+- Add **LVGL only if justified** by actual screen/navigation complexity and measured memory consumption. `esp_lcd` itself is a panel/transfer API, not a replacement for drawing primitives.
+- Legacy display-library code may be kept only outside the active build. Do not
+  introduce Arduino-as-component into the new production design.
 - Keep `sdkconfig.defaults` for intentionally shared defaults; do not commit machine-specific configuration or credentials.
 - Do not guess framework APIs or component versions. Verify against installed ESP-IDF headers and pinned dependency versions before changing code.
 
@@ -147,7 +150,7 @@ Use ordinary ESP-IDF component `CMakeLists.txt` files and `idf_component.yml` ma
 
 ## Build, tests and validation
 
-For the **new ESP-IDF application**:
+For the **ESP-IDF application**:
 
 ```bash
 idf.py set-target esp32c3
@@ -155,7 +158,9 @@ idf.py build
 idf.py -p <PORT> flash monitor
 ```
 
-These commands become applicable **after** the root ESP-IDF CMake project is created; they are not assertions that the current repository already supports them.
+The native display example is now wired for these commands; a successful build
+still requires the ESP-IDF Python environment and target toolchain to be
+installed on the machine running them.
 
 At minimum, verify:
 1. Builds cleanly with the selected ESP-IDF version.
@@ -171,11 +176,12 @@ Host tests should cover protocol framing/CRC, parsing, range conversion, and ang
 
 ## Known migration hazards
 
-- Legacy `MENU=6` is accepted while the gauge arrays have **six entries indexed 0..5**: fix this before reusing the parser.
-- Legacy needle lookup expressions such as `x2[a1 - 2]` may produce invalid indices: normalize angles/indices and test boundaries.
-- Legacy `loop()` redraws the whole frame without pacing: introduce a defined update cadence.
-- Legacy gauges and `Orbitron_Medium_28` rely on TFT_eSPI-specific image/font conventions: verify conversions visually.
-- `TFT_eSprite` full-frame allocation may compete with Wi-Fi and HTTP memory; measure before choosing a rendering backend.
+- Legacy `MENU=6` was accepted while the old gauge arrays had **six entries indexed 0..5**. Do not bring that parser back without validation.
+- Legacy needle lookup expressions such as `x2[a1 - 2]` may produce invalid indices: the LVGL demo computes and clamps its needle geometry directly.
+- The active demo uses a 33 ms LVGL timer and a partial buffer instead of the legacy full-frame `loop()` redraw.
+- Legacy gauges and `Orbitron_Medium_28` rely on old image/font conventions:
+  verify conversions visually when migrating them to LVGL.
+- A full-frame legacy allocation may compete with Wi-Fi and HTTP memory; measure before choosing a rendering backend.
 - Any SSD1306 demo belongs to the legacy experiments. The **production OLED lives on the RP2040**, not here.
 
 ## Rules for coding agents

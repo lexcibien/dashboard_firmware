@@ -1,0 +1,63 @@
+menu "Dashboard display"
+
+config DASHBOARD_LCD_MOSI_GPIO
+    int "GC9A01 MOSI GPIO"
+    range 0 21
+    default 6
+    help
+        Provisional smoke-test pin. Verify the actual board wiring before use.
+
+config DASHBOARD_LCD_SCLK_GPIO
+    int "GC9A01 SCLK GPIO"
+    range 0 21
+    default 4
+    help
+        Provisional smoke-test pin. Verify the actual board wiring before use.
+
+config DASHBOARD_LCD_CS_GPIO
+    int "GC9A01 CS GPIO"
+    range 0 21
+    default 7
+    help
+        Provisional smoke-test pin. Verify the actual board wiring before use.
+
+config DASHBOARD_LCD_DC_GPIO
+    int "GC9A01 DC GPIO"
+    range 0 21
+    default 10
+    help
+        Provisional smoke-test pin. Verify the actual board wiring before use.
+
+config DASHBOARD_LCD_RST_GPIO
+    int "GC9A01 reset GPIO"
+    range -1 21
+    default 3
+    help
+        Use -1 when the panel reset pin is not connected.
+
+config DASHBOARD_LCD_BACKLIGHT_GPIO
+    int "Backlight GPIO"
+    range -1 21
+    default -1
+    help
+        Use -1 when the backlight is permanently enabled or controlled externally.
+
+config DASHBOARD_LCD_SPI_CLOCK_HZ
+    int "GC9A01 SPI clock (Hz)"
+    range 1000000 40000000
+    default 20000000
+
+config DASHBOARD_LCD_SWAP_BYTES
+    bool "Swap RGB565 bytes before sending"
+    default y
+    help
+        GC9A01 SPI panels normally expect the high byte first. Confirm with a
+        color-bar test if the panel shows swapped colors.
+
+config DASHBOARD_LCD_INVERT_COLOR
+    bool "Invert GC9A01 colors"
+    default n
+    help
+        Enable only if the specific panel variant requires color inversion.
+
+endmenu
